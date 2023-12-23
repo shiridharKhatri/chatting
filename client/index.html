@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="/socket.io/socket.io.js"></script>
+    <title>Chatting</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      padding: 1rem;
+      background: #1d2127;
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    header {
+      padding: 1rem;
+      display: flex;
+      height: 12%;
+      justify-content: left;
+      align-items: center;
+      border-bottom: 0.1rem solid #445;
+    }
+
+    header img {
+      margin-right: 1rem;
+    }
+
+    header h1 {
+      color: #d1d7e0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    header p {
+      color: #aaaeb6;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    form {
+      width: 100%;
+      height: 10%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* background-color: red; */
+    }
+
+    form input {
+      width: 80%;
+      padding: 1rem 1rem 1rem 2rem;
+      height: 5.5rem;
+      border: 0.1rem solid #445;
+      background-color: transparent;
+      border-radius: 3rem;
+      color: #ffffff;
+      outline: none;
+    }
+
+    form button {
+      padding: 1rem;
+      height: 5.5rem;
+      border: 0.1rem solid #445;
+      background-color: #d1d7e0;
+      border-radius: 3rem;
+      width: 5.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: 1rem;
+      cursor: pointer;
+    }
+    .container {
+      padding: 1rem;
+      height: 80%;
+      overflow-y: scroll;
+    }
+    .container::-webkit-scrollbar {
+      display: none;
+    }
+    .container .chatBox {
+      background-color: #445;
+      border-radius: 3rem;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #d1d7e0;
+      margin: 1rem;
+      font-size: 1.3rem;
+      padding: 1.5rem 2rem;
+      width: auto;
+    }
+    .container .right {
+      background: linear-gradient(45deg, #fb7140, #fb9951);
+      color: #101010;
+      float: right;
+      clear: both;
+    }
+    .container .left {
+      float: left;
+      clear: both;
+    }
+    .container .joined {
+      clear: both;
+      width: 30%;
+      position: relative;
+      margin: 1rem auto;
+      top: 2rem;
+      bottom: 2rem;
+      border-radius: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+      border: 0.1rem solid #1fb141;
+      color: #1fb141;
+      padding: 1rem;
+    }
+    .container .gone {
+      clear: both;
+      width: 30%;
+      position: relative;
+      margin: 1rem auto;
+      top: 2rem;
+      bottom: 2rem;
+      border-radius: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: transparent;
+      border: 0.1rem solid #cc0202;
+      color: #cc0202;
+      padding: 1rem;
+    }
+  </style>
+  <body>
+    <header>
+      <img
+        width="60"
+        height="60"
+        src="https://img.icons8.com/3d-fluency/94/user-male-circle.png"
+        alt="user-male-circle"
+      />
+      <div class="desc">
+        <h1>Group chat</h1>
+        <p id="user-count">0 Members</p>
+      </div>
+    </header>
+
+    <div class="container"></div>
+    <form action="">
+      <input id="inpVal" type="text" placeholder="Type your message..." />
+      <button id="sendButton">
+        <img
+          width="28"
+          height="28"
+          src="https://img.icons8.com/fluency/48/sent.png"
+          alt="sent"
+        />
+      </button>
+    </form>
+
+    <!-- Script Part  -->
+    <script>
+      let socket = io();
+      let userCount = document.getElementById("user-count");
+      let container = document.querySelector(".container");
+      let append = (message, className) => {
+        let newDiv = document.createElement("div");
+        newDiv.classList.add(className);
+        newDiv.classList.add("chatBox");
+        newDiv.innerText = message;
+        container.append(newDiv);
+      };
+      let userName = prompt("Enter your name");
+      socket.emit("new-user-joined", userName);
+      socket.on("user-joined", (data) => {
+        append(data, "joined");
+      });
+
+      socket.on("userCount", (count) => {
+        userCount.innerHTML = count;
+      });
+
+      socket.on("user-left", (data) => {
+        console.log(data);
+        append(data, "gone");
+      });
+
+      let sendButton = document.getElementById("sendButton");
+      sendButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        let inpVal = document.getElementById("inpVal");
+        socket.emit("sendMessage", inpVal.value);
+        append(inpVal.value, "right");
+
+        inpVal.value = "";
+      });
+      socket.on("received-message", (data) => {
+        append(data, "left");
+      });
+    </script>
+  </body>
+</html>
