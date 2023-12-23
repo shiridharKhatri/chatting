@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <script src="/socket.io/socket.io.js"></script>
     <title>Chatting</title>
   </head>
@@ -89,6 +93,7 @@
       max-height: 80%;
       overflow-y: auto;
       width: 100%;
+      margin: 0 0 2rem 0;
     }
     .container::-webkit-scrollbar {
       display: none;
@@ -190,6 +195,7 @@
       socket.emit("new-user-joined", userName);
       socket.on("user-joined", (data) => {
         append(data, "joined");
+        container.scrollTop = container.scrollHeight;
       });
 
       socket.on("userCount", (count) => {
@@ -199,6 +205,7 @@
       socket.on("user-left", (data) => {
         console.log(data);
         append(data, "gone");
+        container.scrollTop = container.scrollHeight;
       });
 
       let sendButton = document.getElementById("sendButton");
