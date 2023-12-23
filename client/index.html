@@ -18,7 +18,7 @@
     }
 
     body {
-      padding: 1rem;
+      padding: 1rem 0.5rem;
       background: #1d2127;
       position: relative;
       width: 100%;
@@ -31,7 +31,7 @@
     header {
       padding: 1rem;
       display: flex;
-      height: 12%;
+      height: 9rem;
       justify-content: left;
       align-items: center;
       border-bottom: 0.1rem solid #445;
@@ -85,9 +85,10 @@
       cursor: pointer;
     }
     .container {
-      padding: 1rem;
-      height: 80%;
-      overflow-y: scroll;
+      padding: 1rem 0;
+      max-height: 80%;
+      overflow-y: auto;
+      width: 100%;
     }
     .container::-webkit-scrollbar {
       display: none;
@@ -114,7 +115,7 @@
     }
     .container .joined {
       clear: both;
-      width: 30%;
+      width: 25rem;
       position: relative;
       margin: 1rem auto;
       top: 2rem;
@@ -130,7 +131,7 @@
     }
     .container .gone {
       clear: both;
-      width: 30%;
+      width: 25rem;
       position: relative;
       margin: 1rem auto;
       top: 2rem;
@@ -148,8 +149,8 @@
   <body>
     <header>
       <img
-        width="60"
-        height="60"
+        width="65"
+        height="65"
         src="https://img.icons8.com/3d-fluency/94/user-male-circle.png"
         alt="user-male-circle"
       />
@@ -177,6 +178,7 @@
       let socket = io();
       let userCount = document.getElementById("user-count");
       let container = document.querySelector(".container");
+
       let append = (message, className) => {
         let newDiv = document.createElement("div");
         newDiv.classList.add(className);
@@ -205,11 +207,13 @@
         let inpVal = document.getElementById("inpVal");
         socket.emit("sendMessage", inpVal.value);
         append(inpVal.value, "right");
-
         inpVal.value = "";
+        container.scrollTop = container.scrollHeight;
       });
+
       socket.on("received-message", (data) => {
         append(data, "left");
+        container.scrollTop = container.scrollHeight;
       });
     </script>
   </body>
